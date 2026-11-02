@@ -31,7 +31,7 @@
 
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;overflow-x:clip;scroll-behavior:smooth}
-body{margin:0;background:var(--pedra);color:var(--tinta);font:400 1.0625rem/1.68 var(--f-txt);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{margin:0;background:var(--pedra);color:var(--tinta);font:400 1.0625rem/1.68 var(--f-txt);-webkit-font-smoothing:antialiased;overflow-x:clip}
 img{max-width:100%;height:auto;display:block}
 a{color:inherit}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
@@ -78,7 +78,8 @@ p{margin:0 0 1em}
 .seta-link:hover svg{transform:translateX(5px)}
 
 /* ---------- Cabeçalho ---------- */
-.topo{position:sticky;top:0;z-index:60;background:rgba(243,245,241,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+.topo{position:sticky;top:0;z-index:60;border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+.topo::before{content:"";position:absolute;inset:0;z-index:-1;background:rgba(243,245,241,.985);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 .topo.rolou{border-color:var(--linha);box-shadow:0 10px 30px -24px rgba(31,42,37,.5)}
 .topo__in{max-width:1320px;margin:0 auto;padding:12px var(--gut);display:flex;align-items:center;gap:24px}
 .topo__logo{flex:none;width:128px}
@@ -89,15 +90,18 @@ p{margin:0 0 1em}
 .menu a[aria-current="page"]{color:var(--agua)}
 .menu a.btn[aria-current="page"]{color:#fff;box-shadow:0 0 0 3px var(--sol)}
 .menu .btn{padding:11px 20px;color:#fff}
-.burguer{display:none;margin-left:auto;width:46px;height:46px;border-radius:50%;background:var(--mata);position:relative;z-index:2}
+.burguer{display:none;margin-left:auto;width:46px;height:46px;border-radius:50%;background:var(--mata);position:relative;z-index:3}
 .burguer span{position:absolute;left:14px;right:14px;height:2px;background:#fff;transition:transform .35s var(--ease),top .35s}
 .burguer span:first-child{top:18px}.burguer span:last-child{top:26px}
 .burguer[aria-expanded="true"] span:first-child{top:22px;transform:rotate(45deg)}
 .burguer[aria-expanded="true"] span:last-child{top:22px;transform:rotate(-45deg)}
 @media (max-width:1020px){
   .burguer{display:block}
-  .menu{position:fixed;inset:0;margin:0;background:var(--mata);flex-direction:column;justify-content:center;gap:16px;opacity:0;visibility:hidden;transform:translateY(-12px);transition:opacity .35s,transform .45s var(--ease),visibility .35s}
+  .menu{position:fixed;inset:0;z-index:2;margin:0;background:var(--mata);flex-direction:column;justify-content:center;gap:16px;opacity:0;visibility:hidden;transform:translateY(-12px);transition:opacity .35s,transform .45s var(--ease),visibility .35s}
   .menu.aberto{opacity:1;visibility:visible;transform:none}
+  .topo:has(.menu.aberto){z-index:90}
+  .burguer[aria-expanded="true"]{background:var(--sol)}
+  .burguer[aria-expanded="true"] span{background:var(--tinta)}
   .menu a{color:#fff;font-size:1.45rem}
   .menu a[aria-current="page"]{color:var(--sol)}
   .menu .btn{margin-top:10px;font-size:1.1rem;background:var(--sol);color:var(--tinta)}
@@ -209,8 +213,8 @@ html:not(.js) .revela,html:not(.js) .revela-arco,html:not(.js) .revela-arco > im
 .indice::-webkit-scrollbar{display:none}
 .indice a{flex:none;padding:9px 16px;border-radius:999px;border:1.5px solid var(--linha);background:var(--branco);font:500 .9rem var(--f-tit);text-decoration:none;transition:background .3s,color .3s,border-color .3s}
 .indice a:hover,.indice a.ativo{background:var(--mata);color:#fff;border-color:var(--mata)}
-.indice-fixo{position:sticky;top:70px;z-index:20;background:rgba(243,245,241,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding-block:10px;border-bottom:1px solid var(--linha)}
-.suite{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(24px,4vw,56px);align-items:center;padding-block:clamp(50px,7vw,80px);border-bottom:1px solid var(--linha);scroll-margin-top:140px}
+.indice-fixo{position:sticky;top:var(--alt-topo,70px);z-index:20;background:rgba(243,245,241,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding-block:10px;border-bottom:1px solid var(--linha)}
+.suite{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(24px,4vw,56px);align-items:center;padding-block:clamp(50px,7vw,80px);border-bottom:1px solid var(--linha);scroll-margin-top:calc(var(--alt-topo,70px) + 96px)}
 .suite:nth-of-type(even) .fotos{order:2}
 .fotos{position:relative;border-radius:22px;overflow:hidden;background:var(--mata);aspect-ratio:4/3}
 .fotos__trilho{display:flex;height:100%;transition:transform .7s var(--ease)}
@@ -320,10 +324,10 @@ html:not(.js) .revela,html:not(.js) .revela-arco,html:not(.js) .revela-arco > im
 
 /* ---------- Normas / FAQ ---------- */
 .normas{display:grid;grid-template-columns:260px 1fr;gap:clamp(30px,5vw,70px);align-items:start}
-.normas nav{position:sticky;top:110px;display:grid;gap:4px}
+.normas nav{position:sticky;top:calc(var(--alt-topo,70px) + 28px);display:grid;gap:4px}
 .normas nav a{padding:10px 14px;border-radius:10px;text-decoration:none;font:500 .95rem var(--f-tit);color:var(--suave);transition:background .3s,color .3s}
 .normas nav a:hover,.normas nav a.ativo{background:var(--branco);color:var(--agua)}
-.bloco-norma{scroll-margin-top:110px;padding-bottom:34px;margin-bottom:34px;border-bottom:1px solid var(--linha)}
+.bloco-norma{scroll-margin-top:calc(var(--alt-topo,70px) + 28px);padding-bottom:34px;margin-bottom:34px;border-bottom:1px solid var(--linha)}
 .bloco-norma:last-child{border:0}
 .bloco-norma h2{font-size:1.5rem;margin-bottom:14px}
 .bloco-norma ul{padding-left:20px;color:var(--suave);margin:0;display:grid;gap:8px}

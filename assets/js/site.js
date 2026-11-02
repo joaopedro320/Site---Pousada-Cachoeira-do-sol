@@ -26,17 +26,32 @@
   function rolou() { if (topo) topo.classList.toggle('rolou', window.scrollY > 10); }
   window.addEventListener('scroll', rolou, { passive: true }); rolou();
 
+  /* Altura real do cabeçalho, para a barra de suítes/normas grudar logo abaixo dele */
+  function mede() { if (topo) document.documentElement.style.setProperty('--alt-topo', topo.offsetHeight + 'px'); }
+  mede(); window.addEventListener('resize', mede);
+
   var burguer = $('.burguer'), menu = $('#menu');
-  if (burguer) {
-    burguer.addEventListener('click', function () {
-      var abre = !menu.classList.contains('aberto');
-      menu.classList.toggle('aberto', abre);
-      burguer.setAttribute('aria-expanded', abre);
-      burguer.setAttribute('aria-label', abre ? 'Fechar menu' : 'Abrir menu');
-      document.body.style.overflow = abre ? 'hidden' : '';
-    });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('aberto')) burguer.click(); });
+  function menuAbre(abre) {
+    if (!burguer) return;
+    menu.classList.toggle('aberto', abre);
+    burguer.setAttribute('aria-expanded', abre);
+    burguer.setAttribute('aria-label', abre ? 'Fechar menu' : 'Abrir menu');
+    document.documentElement.style.overflow = abre ? 'hidden' : '';
   }
+  if (burguer) {
+    burguer.addEventListener('click', function () { menuAbre(!menu.classList.contains('aberto')); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('aberto')) menuAbre(false); });
+    /* Fecha o menu ao tocar em qualquer link dele */
+    $$('a', menu).forEach(function (a) { a.addEventListener('click', function () { menuAbre(false); }); });
+    /* Voltou para o menu maior (desktop) com ele aberto: fecha e libera a rolagem */
+    window.addEventListener('resize', function () { if (window.innerWidth > 1020 && menu.classList.contains('aberto')) menuAbre(false); });
+  }
+  /* Ao voltar para a página pelo botão "voltar" do navegador, nada pode ficar travado */
+  window.addEventListener('pageshow', function () {
+    menuAbre(false);
+    var lbx = $('#lb'); if (lbx && !lbx.hidden) { lbx.classList.remove('aberto'); lbx.hidden = true; }
+    document.documentElement.style.overflow = '';
+  });
 
   /* Balão do WhatsApp flutuante (uma vez) */
   var wa = $('.wa');
@@ -129,7 +144,13 @@
         links.forEach(function (a) {
           var on = a.getAttribute('href') === '#' + en.target.id;
           a.classList.toggle('ativo', on);
-          if (on && nav.scrollWidth > nav.clientWidth) a.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduz ? 'auto' : 'smooth' });
+          /* Centraliza o item só na horizontal, dentro da própria barra.
+             (scrollIntoView também rolava a página e travava a descida.) */
+          if (on && nav.scrollWidth > nav.clientWidth) {
+            var rn = nav.getBoundingClientRect(), ra = a.getBoundingClientRect();
+            var alvo = nav.scrollLeft + (ra.left - rn.left) - (nav.clientWidth - ra.width) / 2;
+            nav.scrollTo({ left: Math.max(0, alvo), behavior: reduz ? 'auto' : 'smooth' });
+          }
         });
       });
     }, { rootMargin: '-40% 0px -55% 0px' });
@@ -177,12 +198,12 @@
       grupo = $$('[data-lb="' + nome + '"]').filter(function (x) { return !x.hidden; });
       antes = document.activeElement;
       lb.hidden = false; requestAnimationFrame(function () { lb.classList.add('aberto'); });
-      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       mostra(grupo.indexOf(b)); $('#lbX').focus();
       evento('abrir_foto', { grupo: nome });
     }
     function fecha() {
-      lb.classList.remove('aberto'); document.body.style.overflow = '';
+      lb.classList.remove('aberto'); document.documentElement.style.overflow = '';
       setTimeout(function () { lb.hidden = true; }, 280);
       if (antes) antes.focus();
     }
