@@ -1,7 +1,7 @@
 # Pousada Cachoeira do Sol | Site completo
 
 Site institucional com várias páginas, refeito a partir do site atual pousadacachoeiradosol.com.br.
-Desenvolvido por **Malta Business** (https://maltabusiness.vercel.app/). HTML, CSS e JS puros, sem build, pronto para a Vercel.
+Desenvolvido por **Malta Business** (https://maltabusiness.com.br/). HTML, CSS e JS puros, sem build, pronto para a Vercel.
 
 ## Estrutura
 
